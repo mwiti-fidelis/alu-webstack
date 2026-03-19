@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Script that displays information about subdomains
+
+domain=$1
+subdomain=$2
+
+# Function to fetch and print DNS record
+check_dns() {
+    local target_sub=$1
+    local target_dom=$2
+    # dig +short returns just the IP. awk formats the output.
+    res=$(dig "$target_sub.$target_dom" +short)
+    if [ -n "$res" ]; then
+        echo "The subdomain $target_sub is a A record and points to $res"
+    fi
+}
+
+if [ "$#" -lt 1 ]; then
+    exit 1
+fi
+
+if [ -n "$subdomain" ]; then
+    # If a specific subdomain is provided
+    check_dns "$subdomain" "$domain"
+else
+    # Default list in specific order
+    for sub in www lb-01 web-01 web-02; do
+        check_dns "$sub" "$domain"
+    done
+fi
