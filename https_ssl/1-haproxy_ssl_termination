@@ -32,3 +32,17 @@ defaults
         errorfile 502 /etc/haproxy/errors/502.http
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
+
+frontend http_front
+    bind *:80
+    redirect scheme https code 301 if !{ ssl_fc }
+
+frontend https_front
+    bind *:443 ssl crt /etc/ssl/certs/haproxy-natnael.pem
+    mode http
+    default_backend web_backends
+
+backend web_backends
+    balance roundrobin
+    server web1 44.204.86.70:80 check
+    server web2 44.212.36.48:80 check
